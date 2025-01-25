@@ -1,14 +1,17 @@
 package rosa.victor.reservation.reservation
 
 import jakarta.enterprise.context.ApplicationScoped
+import org.eclipse.microprofile.rest.client.inject.RestClient
 import rosa.victor.reservation.inventory.Car
 import rosa.victor.reservation.inventory.InventoryClient
+import rosa.victor.reservation.rental.RentalClient
 import java.time.LocalDate
 
 @ApplicationScoped
 class ReservationService(
-  private val reservationRepository: ReservationRepository,
-  private val inventoryClient: InventoryClient
+  val reservationRepository: ReservationRepository,
+  val inventoryClient: InventoryClient,
+  @RestClient val rentalClient: RentalClient,
 ) {
 
   fun availability(startDay: LocalDate, endDay: LocalDate): Collection<Car> {
@@ -28,7 +31,15 @@ class ReservationService(
     return carsById.values
   }
 
-  fun createReservation(reservation: Reservation): Reservation = reservationRepository.save(reservation)
+  fun createReservation(reservation: Reservation): Reservation {
+    val result = reservationRepository.save(reservation)
+    val userId = "x"  // dummy data, in later parts we will use a proper userId
 
+    if (reservation.startDay == LocalDate.now()) {
 
+      // call the rental service using the rental client
+      val rental = result.id?.let { rentalClient.start(userId, it) }
+    }
+    return result
+  }
 }
