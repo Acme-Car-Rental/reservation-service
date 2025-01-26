@@ -1,8 +1,8 @@
 package rosa.victor.reservation.inventory
 
 data class Car(
-  val id: Long,
-  val licensePlateNumber: String,
-  val manufacturer: String,
-  val model: String,
+  val id: Long? = null,
+  val licensePlateNumber: String = "Unknown",
+  val manufacturer: String = "Unknown",
+  val model: String = "Unknown"
 )

@@ -1,16 +1,17 @@
 package rosa.victor.reservation.reservation
 
+import io.smallrye.graphql.client.GraphQLClient
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import rosa.victor.reservation.inventory.Car
-import rosa.victor.reservation.inventory.InventoryClient
+import rosa.victor.reservation.inventory.GraphQLInventoryClient
 import rosa.victor.reservation.rental.RentalClient
 import java.time.LocalDate
 
 @ApplicationScoped
 class ReservationService(
   val reservationRepository: ReservationRepository,
-  val inventoryClient: InventoryClient,
+  @GraphQLClient("inventory") val inventoryClient: GraphQLInventoryClient,
   @RestClient val rentalClient: RentalClient,
 ) {
 
@@ -21,7 +22,7 @@ class ReservationService(
     // create a map from id to car
     val carsById: HashMap<Long, Car> = HashMap()
     for (car in availableCars) {
-      carsById[car.id] = car
+      carsById[car.id!!] = car
     }
 
     reservationRepository.findAll()
